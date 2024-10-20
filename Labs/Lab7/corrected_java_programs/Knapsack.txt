@@ -1,0 +1,63 @@
+import java.util.Scanner;
+
+public class Knapsack {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the number of items: ");
+        int N = scanner.nextInt();   // number of items
+        System.out.print("Enter the maximum weight of the knapsack: ");
+        int W = scanner.nextInt();   // maximum weight of knapsack
+
+        int[] profit = new int[N + 1];
+        int[] weight = new int[N + 1];
+
+        // Generate random instance, items 1..N
+        for (int n = 1; n <= N; n++) {
+            profit[n] = (int) (Math.random() * 1000);
+            weight[n] = (int) (Math.random() * W);
+        }
+
+        // opt[n][w] = max profit of packing items 1..n with weight limit w
+        // sol[n][w] = does opt solution to pack items 1..n with weight limit w include item n?
+        int[][] opt = new int[N + 1][W + 1];
+        boolean[][] sol = new boolean[N + 1][W + 1];
+
+        for (int n = 1; n <= N; n++) {
+            for (int w = 1; w <= W; w++) {
+
+                // Don't take item n
+                int option1 = opt[n - 1][w]; // Corrected indexing
+
+                // Take item n
+                int option2 = Integer.MIN_VALUE;
+                if (weight[n] <= w) { // Correct condition
+                    option2 = profit[n] + opt[n - 1][w - weight[n]]; // Corrected profit reference
+                }
+
+                // Select better of two options
+                opt[n][w] = Math.max(option1, option2);
+                sol[n][w] = (option2 > option1);
+            }
+        }
+
+        // Determine which items to take
+        boolean[] take = new boolean[N + 1];
+        for (int n = N, w = W; n > 0; n--) {
+            if (sol[n][w]) {
+                take[n] = true;
+                w = w - weight[n];
+            } else {
+                take[n] = false;
+            }
+        }
+
+        // Print results
+        System.out.println("item" + "\t" + "profit" + "\t" + "weight" + "\t" + "take");
+        for (int n = 1; n <= N; n++) {
+            System.out.println(n + "\t" + profit[n] + "\t" + weight[n] + "\t" + take[n]);
+        }
+
+        scanner.close(); // Close the scanner
+    }
+}

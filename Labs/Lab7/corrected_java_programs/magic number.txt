@@ -1,0 +1,28 @@
+import java.util.*;
+
+public class MagicNumberCheck {
+    public static void main(String args[]) {
+        Scanner ob = new Scanner(System.in);
+        System.out.println("Enter the number to be checked:");
+        int n = ob.nextInt();
+        int num = n;
+
+        while (num > 9) {
+            int sum = 0; // Initialize sum to 0 for each iteration
+            int s = 0;
+            while (num != 0) { // Correct condition to process all digits
+                s = s + (num % 10); // Sum the digits
+                num = num / 10; // Move to the next digit
+            }
+            num = s; // Update num to the sum of digits
+        }
+        
+        if (num == 1) {
+            System.out.println(n + " is a Magic Number.");
+        } else {
+            System.out.println(n + " is not a Magic Number.");
+        }
+
+        ob.close(); // Close the scanner
+    }
+}

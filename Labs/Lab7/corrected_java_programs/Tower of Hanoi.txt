@@ -1,0 +1,16 @@
+public class MainClass {
+    public static void main(String[] args) {
+        int nDisks = 3; // Number of disks
+        doTowers(nDisks, 'A', 'B', 'C'); // A, B, C are the names of the rods
+    }
+
+    public static void doTowers(int topN, char from, char inter, char to) {
+        if (topN == 1) {
+            System.out.println("Disk 1 from " + from + " to " + to);
+        } else {
+            doTowers(topN - 1, from, to, inter); // Move topN-1 disks from 'from' to 'inter'
+            System.out.println("Disk " + topN + " from " + from + " to " + to); // Move the nth disk to 'to'
+            doTowers(topN - 1, inter, from, to); // Move the disks from 'inter' to 'to'
+        }
+    }
+}

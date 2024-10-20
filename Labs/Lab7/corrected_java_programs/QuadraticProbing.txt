@@ -1,0 +1,183 @@
+import java.util.Scanner;
+
+/** Class QuadraticProbingHashTable **/
+class QuadraticProbingHashTable {
+    private int currentSize, maxSize;
+    private String[] keys;
+    private String[] vals;
+
+    /** Constructor **/
+    public QuadraticProbingHashTable(int capacity) {
+        currentSize = 0;
+        maxSize = capacity;
+        keys = new String[maxSize];
+        vals = new String[maxSize];
+    }
+
+    /** Function to clear hash table **/
+    public void makeEmpty() {
+        currentSize = 0;
+        keys = new String[maxSize];
+        vals = new String[maxSize];
+    }
+
+    /** Function to get size of hash table **/
+    public int getSize() {
+        return currentSize;
+    }
+
+    /** Function to check if hash table is full **/
+    public boolean isFull() {
+        return currentSize == maxSize;
+    }
+
+    /** Function to check if hash table is empty **/
+    public boolean isEmpty() {
+        return getSize() == 0;
+    }
+
+    /** Function to check if hash table contains a key **/
+    public boolean contains(String key) {
+        return get(key) != null;
+    }
+
+    /** Function to get hash code of a given key **/
+    private int hash(String key) {
+        return (key.hashCode() % maxSize + maxSize) % maxSize; // Ensure non-negative index
+    }
+
+    /** Function to insert key-value pair **/
+    public void insert(String key, String val) {
+        if (isFull()) {
+            System.out.println("Hash Table is full. Cannot insert.");
+            return;
+        }
+
+        int index = hash(key);
+        int h = 1;
+
+        while (keys[index] != null) {
+            if (keys[index].equals(key)) {
+                vals[index] = val; // Update existing value
+                return;
+            }
+            index = (index + h * h) % maxSize; // Quadratic probing
+            h++;
+        }
+
+        keys[index] = key;
+        vals[index] = val;
+        currentSize++;
+    }
+
+    /** Function to get value for a given key **/
+    public String get(String key) {
+        int index = hash(key);
+        int h = 1;
+
+        while (keys[index] != null) {
+            if (keys[index].equals(key)) {
+                return vals[index];
+            }
+            index = (index + h * h) % maxSize; // Quadratic probing
+            h++;
+        }
+
+        return null; // Key not found
+    }
+
+    /** Function to remove key and its value **/
+    public void remove(String key) {
+        if (!contains(key)) {
+            System.out.println("Key not found. Cannot remove.");
+            return;
+        }
+
+        int index = hash(key);
+        int h = 1;
+
+        while (!key.equals(keys[index])) {
+            index = (index + h * h) % maxSize; // Quadratic probing
+            h++;
+        }
+
+        keys[index] = vals[index] = null; // Remove the key-value pair
+
+        // Rehashing the following elements
+        for (index = (index + h * h) % maxSize; keys[index] != null; index = (index + h * h) % maxSize) {
+            String tempKey = keys[index];
+            String tempVal = vals[index];
+            keys[index] = vals[index] = null; // Clear the current index
+            currentSize--; // Decrease size temporarily for re-insertion
+            insert(tempKey, tempVal); // Re-insert the key-value pair
+        }
+
+        currentSize--; // Decrease size after removal
+    }
+
+    /** Function to print HashTable **/
+    public void printHashTable() {
+        System.out.println("\nHash Table: ");
+        for (int i = 0; i < maxSize; i++)
+            if (keys[i] != null)
+                System.out.println(keys[i] + " " + vals[i]);
+        System.out.println();
+    }
+}
+
+/** Class QuadraticProbingHashTableTest **/
+public class QuadraticProbingHashTableTest {
+    public static void main(String[] args) {
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Hash Table Test\n\n");
+
+        System.out.println("Enter size:");
+        QuadraticProbingHashTable qpht = new QuadraticProbingHashTable(scan.nextInt());
+
+        char ch;
+
+        /** Perform QuadraticProbingHashTable operations **/
+        do {
+            System.out.println("\nHash Table Operations\n");
+            System.out.println("1. insert ");
+            System.out.println("2. remove");
+            System.out.println("3. get");
+            System.out.println("4. clear");
+            System.out.println("5. size");
+
+            int choice = scan.nextInt();
+            switch (choice) {
+                case 1:
+                    System.out.println("Enter key and value:");
+                    qpht.insert(scan.next(), scan.next());
+                    break;
+                case 2:
+                    System.out.println("Enter key:");
+                    qpht.remove(scan.next());
+                    break;
+                case 3:
+                    System.out.println("Enter key:");
+                    System.out.println("Value = " + qpht.get(scan.next()));
+                    break;
+                case 4:
+                    qpht.makeEmpty();
+                    System.out.println("Hash Table Cleared\n");
+                    break;
+                case 5:
+                    System.out.println("Size = " + qpht.getSize());
+                    break;
+                default:
+                    System.out.println("Wrong Entry \n");
+                    break;
+            }
+
+            /** Display hash table **/
+            qpht.printHashTable();
+
+            System.out.println("\nDo you want to continue (Type y or n) \n");
+            ch = scan.next().charAt(0);
+        } while (ch == 'Y' || ch == 'y');
+
+        scan.close(); // Close the scanner
+    }
+}
